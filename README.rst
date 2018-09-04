@@ -1,5 +1,7 @@
-pytest-selenium
-===============
+pytest-selenium-session
+=======================
+
+This fork hacks in session scope to pytest-selenium fixtures. This contradicts the original library's design and might introduce bugs, so **use it with extreme care**.
 
 pytest-selenium is a plugin for `pytest <http://pytest.org>`_ that provides
 support for running `Selenium <http://seleniumhq.org/>`_ based tests.
