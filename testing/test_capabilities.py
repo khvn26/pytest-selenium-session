@@ -36,8 +36,8 @@ def test_file_remote(testdir):
     file_test = testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
-        def test_capabilities(session_capabilities, capabilities):
-            assert session_capabilities['{0}']['args'] == ['foo']
+        def test_capabilities(capabilities):
+            assert capabilities['{0}']['args'] == ['foo']
             assert capabilities['{0}']['args'] == ['foo']
     """.format(key))
     testdir.quick_qa(
@@ -59,8 +59,8 @@ def test_mark(testdir):
         import pytest
         @pytest.mark.nondestructive
         @pytest.mark.capabilities(foo='bar')
-        def test_capabilities(session_capabilities, capabilities):
-            assert 'foo' not in session_capabilities
+        def test_capabilities(capabilities):
+            assert 'foo' not in capabilities
             assert capabilities['foo'] == 'bar'
     """)
     testdir.quick_qa(file_test, passed=1)

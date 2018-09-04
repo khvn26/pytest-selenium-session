@@ -25,7 +25,7 @@ def test_launch(testdir, httpserver):
 def test_options(testdir):
     testdir.makepyfile("""
         import pytest
-        @pytest.fixture
+        @pytest.fixture(scope='session')
         def chrome_options(chrome_options):
             chrome_options.binary_location = '/foo/bar'
             return chrome_options
@@ -44,11 +44,11 @@ def test_options(testdir):
 def test_args(testdir):
     file_test = testdir.makepyfile("""
         import pytest
-        @pytest.fixture
+        @pytest.fixture(scope='session')
         def driver_log():
             return None
 
-        @pytest.fixture
+        @pytest.fixture(scope='session')
         def driver_args():
             return ['--log-path=foo.log']
 

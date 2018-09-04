@@ -68,7 +68,7 @@ def driver_kwargs(capabilities, driver_log, driver_path, firefox_options,
     return kwargs
 
 
-@pytest.fixture
+@pytest.fixture(scope='session')
 def firefox_options(request, firefox_path, firefox_profile):
     options = Options()
 
@@ -103,7 +103,7 @@ def firefox_path(pytestconfig):
         return pytestconfig.getoption('firefox_path')
 
 
-@pytest.fixture
+@pytest.fixture(scope='session')
 def firefox_profile(pytestconfig):
     profile = None
     if pytestconfig.getoption('firefox_profile'):

@@ -67,22 +67,15 @@ def pytest_addhooks(pluginmanager):
 
 
 @pytest.fixture(scope='session')
-def session_capabilities(pytestconfig):
-    """Returns combined capabilities from pytest-variables and command line"""
+def capabilities(request, driver_class, chrome_options, firefox_options, pytestconfig):
+    """Returns combined capabilities"""
     driver = pytestconfig.getoption('driver').upper()
     capabilities = getattr(DesiredCapabilities, driver, {}).copy()
     if driver == 'REMOTE':
         browser = capabilities.get('browserName', '').upper()
         capabilities.update(getattr(DesiredCapabilities, browser, {}))
     capabilities.update(pytestconfig._capabilities)
-    return capabilities
-
-
-@pytest.fixture
-def capabilities(request, driver_class, chrome_options, firefox_options,
-                 session_capabilities):
-    """Returns combined capabilities"""
-    capabilities = copy.deepcopy(session_capabilities)  # make a copy
+ 
     if driver_class == webdriver.Remote:
         browser = capabilities.get('browserName', '').upper()
         key, options = (None, None)
@@ -120,13 +113,13 @@ def get_capabilities_from_markers(node):
         return capabilities.kwargs if capabilities else {}
 
 
-@pytest.fixture
+@pytest.fixture(scope='session')
 def driver_args():
     """Return arguments to pass to the driver service"""
     return None
 
 
-@pytest.fixture
+@pytest.fixture(scope='session')
 def driver_kwargs(request, capabilities, chrome_options, driver_args,
                   driver_class, driver_log, driver_path, firefox_options,
                   firefox_profile, pytestconfig):
@@ -157,18 +150,18 @@ def driver_class(request):
     return SUPPORTED_DRIVERS[driver]
 
 
-@pytest.fixture
-def driver_log(tmpdir):
+@pytest.fixture(scope='session')
+def driver_log(tmpdir_factory):
     """Return path to driver log"""
-    return str(tmpdir.join('driver.log'))
+    return str(tmpdir_factory.mktemp('pytest_selenium_session').join('driver.log'))
 
 
-@pytest.fixture
+@pytest.fixture(scope='session')
 def driver_path(request):
     return request.config.getoption('driver_path')
 
 
-@pytest.yield_fixture
+@pytest.yield_fixture(scope='session')
 def driver(request, driver_class, driver_kwargs):
     """Returns a WebDriver instance based on options and capabilities"""
     driver = driver_class(**driver_kwargs)
@@ -187,7 +180,7 @@ def driver(request, driver_class, driver_kwargs):
     driver.quit()
 
 
-@pytest.yield_fixture
+@pytest.yield_fixture(scope='session')
 def selenium(driver):
     yield driver
 
