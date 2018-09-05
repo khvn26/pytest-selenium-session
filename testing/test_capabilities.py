@@ -38,7 +38,6 @@ def test_file_remote(testdir):
         @pytest.mark.nondestructive
         def test_capabilities(capabilities):
             assert capabilities['{0}']['args'] == ['foo']
-            assert capabilities['{0}']['args'] == ['foo']
     """.format(key))
     testdir.quick_qa(
         '--driver', 'Remote', '--variables', variables, file_test, passed=1)
@@ -52,15 +51,3 @@ def test_fixture(testfile, testdir):
             return {'foo': 'bar'}
     """)
     testdir.quick_qa(testfile, passed=1)
-
-
-def test_mark(testdir):
-    file_test = testdir.makepyfile("""
-        import pytest
-        @pytest.mark.nondestructive
-        @pytest.mark.capabilities(foo='bar')
-        def test_capabilities(capabilities):
-            assert 'foo' not in capabilities
-            assert capabilities['foo'] == 'bar'
-    """)
-    testdir.quick_qa(file_test, passed=1)

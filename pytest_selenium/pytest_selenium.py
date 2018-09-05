@@ -90,27 +90,7 @@ def capabilities(request, driver_class, chrome_options, firefox_options, pytestc
         if all([key, options]):
             capabilities[key] = _merge(
                 capabilities.get(key, {}), options.get(key, {}))
-    capabilities.update(get_capabilities_from_markers(request.node))
     return capabilities
-
-
-def get_capabilities_from_markers(node):
-    # get_marker is deprecated since pytest 3.6
-    # https://docs.pytest.org/en/latest/mark.html#marker-revamp-and-iteration
-    try:
-        capabilities = dict()
-        for level, mark in node.iter_markers_with_node('capabilities'):
-            LOGGER.debug('{0} marker <{1.name}> '
-                         'contained kwargs <{1.kwargs}>'.
-                         format(level.__class__.__name__, mark))
-            capabilities.update(mark.kwargs)
-        LOGGER.info('Capabilities from markers: {}'.format(capabilities))
-        return capabilities
-    except AttributeError:
-        # backwards-compat
-        # can be removed when minimum req pytest is 3.6
-        capabilities = node.get_marker('capabilities')
-        return capabilities.kwargs if capabilities else {}
 
 
 @pytest.fixture(scope='session')
@@ -189,10 +169,6 @@ def selenium(driver):
 def pytest_configure(config):
     capabilities = config._variables.get('capabilities', {})
     capabilities.update({k: v for k, v in config.getoption('capabilities')})
-    config.addinivalue_line(
-        'markers', 'capabilities(kwargs): add or change existing '
-        'capabilities. specify capabilities as keyword arguments, for example '
-        'capabilities(foo=''bar'')')
     if hasattr(config, '_metadata'):
         config._metadata['Driver'] = config.getoption('driver')
         config._metadata['Capabilities'] = capabilities
